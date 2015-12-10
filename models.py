@@ -12,5 +12,17 @@ class Setting(db.Model):
         self.name = name
         self.value = value
 
-    def __repr(self):
+    def __repr__(self):
         return '<Setting %s>' % self.name
+
+
+class Voters(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True)
+    voted = db.Column(db.Boolean())
+
+    def __init__(self, key):
+        self.key = key
+
+    def __repr__(self):
+        return '<Voters %s>' % self.key

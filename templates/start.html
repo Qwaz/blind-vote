@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>투표 참가 인원 설정</h1>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('start') }}">
+        {{ form.hidden_tag() }}
+        <div class="formgroup">
+            {{ form.master.label }} {{ form.master() }}
+        </div>
+        <div class="formgroup">
+            {{ form.keys.label }} {{ form.keys() }}
+        </div>
+        <div class="formaction">
+            <a class="button" href="{{ url_for('index') }}">뒤로</a>
+            <button class="button" type="submit">확인</button>
+        </div>
+    </form>
+{% endblock %}
