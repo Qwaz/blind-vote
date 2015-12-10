@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>투표 초기화</h1>
+    마스터키는 {{ form.master.data }}입니다. 잘 적어두세요.
+    <form method="post" action="{{ url_for('init') }}">
+        {{ form.hidden_tag() }}
+        <div class="formgroup">
+            {{ form.vote_name.label }} {{ form.vote_name() }}
+        </div>
+        <div class="formgroup">
+            {{ form.detail.label }} {{ form.detail() }}
+        </div>
+        <div class="formgroup">
+            {{ form.response.label }} {{ form.response() }}
+        </div>
+        <div class="formaction">
+            <button type="submit">확인</button>
+        </div>
+    </form>
+{% endblock %}

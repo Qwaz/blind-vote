@@ -1,6 +1,7 @@
 import os, binascii
-from flask import Flask
+from flask import Flask, render_template, redirect, url_for
 from models import db, Setting
+from forms import InitForm
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -11,15 +12,23 @@ def generate_key():
     return binascii.hexlify(os.urandom(10)).decode('ascii')
 
 
-@app.route('/')
-def hello_world():
-    if Setting.query.filter_by(name='master').first():
-        return 'Master Key Initialized'
+@app.route('/init', methods=['POST'])
+def init():
+    if Setting.query.filter_by(name='matser').first():
+        return redirect(url_for('index'))
     else:
-        master = Setting('master', generate_key())
-        db.session.add(master)
-        db.session.commit()
-        return 'Master Key is %s' % master.value
+        form = InitForm()
+        return redirect(url_for('index'))
+
+
+@app.route('/')
+def index():
+    if Setting.query.filter_by(name='master').first():
+        return render_template('simple.html', title="초기화 완료!", content="초기화되었습니다")
+    else:
+        form = InitForm()
+        form.master.data = generate_key()
+        return render_template('init.html', form=form)
 
 
 if __name__ == '__main__':
