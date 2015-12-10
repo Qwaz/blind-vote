@@ -23,6 +23,7 @@ class Voters(db.Model):
 
     def __init__(self, key):
         self.key = key
+        self.voted = False
 
     def __repr__(self):
         return '<Voters %s>' % self.key
