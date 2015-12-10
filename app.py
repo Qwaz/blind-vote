@@ -14,17 +14,24 @@ def generate_key():
 
 @app.route('/init', methods=['POST'])
 def init():
-    if Setting.query.filter_by(name='matser').first():
+    if Setting.query.filter_by(name='master').first():
         return redirect(url_for('index'))
     else:
         form = InitForm()
+        if form.validate():
+            db.session.add(Setting('master', form.master.data))
+            db.session.add(Setting('vote_name', form.vote_name.data))
+            db.session.add(Setting('detail', form.detail.data))
+            db.session.add(Setting('response', form.response.data))
+            db.session.commit()
         return redirect(url_for('index'))
 
 
 @app.route('/')
 def index():
     if Setting.query.filter_by(name='master').first():
-        return render_template('simple.html', title="초기화 완료!", content="초기화되었습니다")
+        vote_name = Setting.query.filter_by(name='vote_name').first().value
+        return render_template('wait.html', vote_name=vote_name, key=generate_key())
     else:
         form = InitForm()
         form.master.data = generate_key()

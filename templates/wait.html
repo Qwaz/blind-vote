@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ vote_name }}</h1>
+    아직 투표가 시작되지 않았습니다. 다음 키를 복사해서 전달해주세요.
+    정말 익명인지 의심스럽다면, <a href="http://rumkin.com/tools/password/pass_gen.php">이런 사이트</a>를 사용해도 됩니다.
+    <p>{{ key }}</p>
+{% endblock %}
