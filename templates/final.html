@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>{{ get_setting('vote_name') }}</h1>
-    투표가 종료되었습니다.
+    투표가 종료되었습니다. 투표 DB를 <a href="{{ url_for('static', filename='app.db') }}">다운로드</a>받아 진짜 익명인지 확인해보세요.
     <ul>
         {% for name, count in result %}
             <li>{{ name }}: {{ count }}표</li>

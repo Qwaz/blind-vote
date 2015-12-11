@@ -1,4 +1,4 @@
-import os, binascii, re
+import os, shutil, binascii, re
 from flask import Flask, request, render_template, redirect, url_for
 from models import db, Setting, Voters, Vote
 from forms import InitForm, StartForm, VoteForm
@@ -93,6 +93,8 @@ def vote():
                 remain = get_remain()
                 if remain == 0:
                     set_stage('result')
+                    base = os.path.abspath(os.path.dirname(__file__))
+                    shutil.copy2(os.path.join(base, 'app.db'), os.path.join(base, 'static/app.db'))
                 db.session.commit()
                 return render_template('result.html', vote=vote, select=list(split_response())[vote.selection][1],
                                        remain=remain)
