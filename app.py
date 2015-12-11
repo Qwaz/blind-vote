@@ -113,7 +113,11 @@ def index():
     elif stage == 'vote':
         return redirect(url_for('vote'))
     elif stage == 'result':
-        return render_template('final.html')
+        result = []
+        responses = split_response()
+        for selection, name in responses:
+            result.append((name, Vote.query.filter_by(selection=int(selection)).count()))
+        return render_template('final.html', result = result)
 
 
 if __name__ == '__main__':

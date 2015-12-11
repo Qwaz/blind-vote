@@ -2,5 +2,41 @@
 
 {% block content %}
     <h1>{{ get_setting('vote_name') }}</h1>
-    투표 끝!
+    투표가 종료되었습니다.
+    <ul>
+        {% for name, count in result %}
+            <li>{{ name }}: {{ count }}표</li>
+        {% endfor %}
+    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+    <div class="canvas-container">
+        <canvas id="result" width="400" height="400"></canvas>
+    </div>
+    <script>
+        var colors = [
+                ["#F7464A", "#FF5A5E"],
+                ["#46BFBD", "#5AD3D1"],
+                ["#FDB45C", "#FFC870"],
+                ["#949FB1", "#A8B3C5"],
+                ["#4D5360", "#616774"]
+        ];
+
+        var data = [
+            {% for name, count in result %}
+                {
+                    value: {{ count }},
+                    label: "{{ name }}",
+                    color: colors[{{ loop.index0 }} % colors.length][0],
+                    highlight: colors[{{ loop.index0 }} % colors.length][1]
+                }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        var option = {
+            responsive: true
+        };
+
+        var ctx = document.getElementById('result').getContext('2d');
+        var resultChart = new Chart(ctx).Pie(data, option);
+    </script>
 {% endblock %}
