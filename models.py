@@ -27,3 +27,14 @@ class Voters(db.Model):
 
     def __repr__(self):
         return '<Voters %s>' % self.key
+
+
+class Vote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    selection = db.Column(db.Integer)
+
+    def __init__(self, selection):
+        self.selection = selection
+
+    def __repr__(self):
+        return '<Vote %d - %d>' % (self.id, self.selection)

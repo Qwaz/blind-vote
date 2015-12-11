@@ -1,7 +1,7 @@
-import os, binascii
+import os, binascii, re
 from flask import Flask, request, render_template, redirect, url_for
-from models import db, Setting, Voters
-from forms import InitForm, StartForm
+from models import db, Setting, Voters, Vote
+from forms import InitForm, StartForm, VoteForm
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -14,6 +14,12 @@ def get_stage():
 
 def generate_key():
     return binascii.hexlify(os.urandom(10)).decode('ascii')
+
+
+def split_response():
+    p = re.compile(',\s*')
+    split_array = p.split(Setting.query.filter_by(name='response').first().value)
+    return zip([str(i) for i in range(len(split_array))], split_array)
 
 
 @app.route('/init', methods=['POST'])
@@ -53,6 +59,33 @@ def start():
     return render_template('start.html', form=form, error=error)
 
 
+@app.route('/vote', methods=['GET', 'POST'])
+def vote():
+    if get_stage().value != 'vote':
+        return redirect(url_for('index'))
+    form = VoteForm()
+    form.selection.choices = split_response()
+
+    error = False
+    if request.method == 'POST':
+        if not form.validate():
+            error = '폼을 채워 주세요'
+        else:
+            voter = Voters.query.filter_by(key=form.key.data).first()
+            if not voter:
+                error = '키를 잘못 입력했어요'
+            elif voter.voted:
+                error = '이미 투표하셨네요'
+            else:
+                voter.voted = True
+                db.session.add(Vote(int(form.selection.data)))
+                db.session.commit()
+                return '투표했어요'
+        form.selection.choices = split_response()
+    return render_template('vote.html', form=form, error=error,
+                           vote_name=Setting.query.filter_by(name='vote_name').first().value)
+
+
 @app.route('/')
 def index():
     stage = get_stage()
@@ -64,7 +97,7 @@ def index():
         vote_name = Setting.query.filter_by(name='vote_name').first().value
         return render_template('wait.html', vote_name=vote_name, key=generate_key())
     elif stage.value == 'vote':
-        return "실제 투표 아직 구현 안 됨"
+        return redirect(url_for('vote'))
 
 
 if __name__ == '__main__':

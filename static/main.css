@@ -14,7 +14,7 @@ body {
 .card h1 {
     font-size: 1.5em;
     margin: 0 -32px 16px;
-    padding: 16px;
+    padding: 20px;
     background-color: #1abc9c;
 }
 
@@ -24,15 +24,26 @@ body {
     font-weight: bold;
 }
 
-.card form input, .card form textarea {
+.card form .formaction {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.card ul {
+    line-height: 1;
+    font-weight: normal;
+    margin: 0;
+}
+
+.card input, .card form textarea {
     display: block;
     width: 100%;
     margin-bottom: 10px;
 }
 
-.card form .formaction {
-    margin-top: 20px;
-    text-align: right;
+.card input[type="radio"] {
+    display: inline;
+    width: auto;
 }
 
 .button {

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ vote_name }}</h1>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('vote') }}">
+        {{ form.hidden_tag() }}
+        <div class="formgroup">
+            {{ form.key.label }} {{ form.key() }}
+        </div>
+        <div class="formgroup">
+            {{ form.selection.label }} {{ form.selection() }}
+        </div>
+        <div class="formaction">
+            <button class="button" type="submit">확인</button>
+        </div>
+    </form>
+{% endblock %}
