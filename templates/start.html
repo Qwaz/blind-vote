@@ -11,7 +11,7 @@
             {{ form.master.label }} {{ form.master() }}
         </div>
         <div class="formgroup">
-            {{ form.keys.label }} {{ form.keys() }}
+            {{ form.keys.label }} {{ form.keys(rows=7) }}
         </div>
         <div class="action">
             <a class="button" href="{{ url_for('index') }}">뒤로</a>
