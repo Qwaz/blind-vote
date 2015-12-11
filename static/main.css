@@ -81,3 +81,8 @@ p.error {
     color: red;
     font-weight: bold;
 }
+
+span.small {
+    font-weight: normal;
+    margin-right: 15px;
+}

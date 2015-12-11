@@ -5,6 +5,7 @@
     {% if error %}
         <p class="error">{{ error }}</p>
     {% endif %}
+    <p>{{ detail }}</p>
     <form method="post" action="{{ url_for('vote') }}">
         {{ form.hidden_tag() }}
         <div class="formgroup">
@@ -14,6 +15,7 @@
             {{ form.selection.label }} {{ form.selection() }}
         </div>
         <div class="formaction">
+            <span class="small">{{ remain }}명 남음</span>
             <button class="button" type="submit">확인</button>
         </div>
     </form>

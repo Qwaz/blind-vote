@@ -16,6 +16,10 @@ def generate_key():
     return binascii.hexlify(os.urandom(10)).decode('ascii')
 
 
+def get_remain():
+    return Voters.query.filter_by(voted=False).count()
+
+
 def split_response():
     p = re.compile(',\s*')
     split_array = p.split(Setting.query.filter_by(name='response').first().value)
@@ -81,10 +85,13 @@ def vote():
                 vote = Vote(int(form.selection.data))
                 db.session.add(vote)
                 db.session.commit()
-                return render_template('result.html', vote=vote, select=list(split_response())[vote.selection][1])
+                return render_template('result.html', vote=vote, select=list(split_response())[vote.selection][1],
+                                       remain=get_remain())
         form.selection.choices = split_response()
     return render_template('vote.html', form=form, error=error,
-                           vote_name=Setting.query.filter_by(name='vote_name').first().value)
+                           vote_name=Setting.query.filter_by(name='vote_name').first().value,
+                           detail=Setting.query.filter_by(name='detail').first().value,
+                           remain=get_remain())
 
 
 @app.route('/')
