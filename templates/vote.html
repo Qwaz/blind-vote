@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{{ vote_name }}</h1>
+    <h1>{{ get_setting('vote_name') }}</h1>
     {% if error %}
         <p class="error">{{ error }}</p>
     {% endif %}
-    <p>{{ detail }}</p>
+    <p>{{ get_setting('detail') }}</p>
     <form method="post" action="{{ url_for('vote') }}">
         {{ form.hidden_tag() }}
         <div class="formgroup">
@@ -14,7 +14,7 @@
         <div class="formgroup">
             {{ form.selection.label }} {{ form.selection() }}
         </div>
-        <div class="formaction">
+        <div class="action">
             <span class="small">{{ remain }}명 남음</span>
             <button class="button" type="submit">확인</button>
         </div>

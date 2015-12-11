@@ -8,8 +8,14 @@ app.config.from_object('config')
 db.init_app(app)
 
 
-def get_stage():
-    return Setting.query.filter_by(name='stage').first()
+def get_setting(name):
+    setting = Setting.query.filter_by(name=name).first()
+    return setting.value if setting else None
+app.jinja_env.globals.update(get_setting=get_setting)
+
+
+def set_stage(stage):
+    Setting.query.filter_by(name='stage').first().value = stage
 
 
 def generate_key():
@@ -22,7 +28,7 @@ def get_remain():
 
 def split_response():
     p = re.compile(',\s*')
-    split_array = p.split(Setting.query.filter_by(name='response').first().value)
+    split_array = p.split(get_setting('response'))
     return zip([str(i) for i in range(len(split_array))], split_array)
 
 
@@ -37,14 +43,14 @@ def init():
             db.session.add(Setting('vote_name', form.vote_name.data))
             db.session.add(Setting('detail', form.detail.data))
             db.session.add(Setting('response', form.response.data))
-            get_stage().value = 'wait'
+            set_stage('wait')
             db.session.commit()
         return redirect(url_for('index'))
 
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
-    if get_stage().value != 'wait':
+    if get_setting('stage') != 'wait':
         return redirect(url_for('index'))
     form = StartForm()
 
@@ -52,12 +58,12 @@ def start():
     if request.method == 'POST':
         if not form.validate():
             error = '폼을 채워 주세요'
-        if form.master.data != Setting.query.filter_by(name='master').first().value:
+        if form.master.data != get_setting('master'):
             error = '마스터 키가 틀렸어요'
         if not error:
             for key in form.keys.data.split():
                 db.session.add(Voters(key))
-            get_stage().value = 'vote'
+            set_stage('vote')
             db.session.commit()
             return redirect(url_for('index'))
     return render_template('start.html', form=form, error=error)
@@ -65,7 +71,7 @@ def start():
 
 @app.route('/vote', methods=['GET', 'POST'])
 def vote():
-    if get_stage().value != 'vote':
+    if get_setting('stage') != 'vote':
         return redirect(url_for('index'))
     form = VoteForm()
     form.selection.choices = split_response()
@@ -84,35 +90,37 @@ def vote():
                 voter.voted = True
                 vote = Vote(int(form.selection.data))
                 db.session.add(vote)
+                remain = get_remain()
+                if remain == 0:
+                    set_stage('result')
                 db.session.commit()
                 return render_template('result.html', vote=vote, select=list(split_response())[vote.selection][1],
-                                       remain=get_remain())
+                                       remain=remain)
         form.selection.choices = split_response()
     return render_template('vote.html', form=form, error=error,
-                           vote_name=Setting.query.filter_by(name='vote_name').first().value,
-                           detail=Setting.query.filter_by(name='detail').first().value,
                            remain=get_remain())
 
 
 @app.route('/')
 def index():
-    stage = get_stage()
-    if stage.value == 'init':
+    stage = get_setting('stage')
+    if stage == 'init':
         form = InitForm()
         form.master.data = generate_key()
         return render_template('init.html', form=form)
-    elif stage.value == 'wait':
-        vote_name = Setting.query.filter_by(name='vote_name').first().value
-        return render_template('wait.html', vote_name=vote_name, key=generate_key())
-    elif stage.value == 'vote':
+    elif stage == 'wait':
+        return render_template('wait.html', key=generate_key())
+    elif stage == 'vote':
         return redirect(url_for('vote'))
+    elif stage == 'result':
+        return render_template('final.html')
 
 
 if __name__ == '__main__':
     app.debug = True
     with app.app_context():
         db.create_all()
-        if not get_stage():
+        if not get_setting('stage'):
             db.session.add(Setting('stage', 'init'))
             db.session.commit()
     app.run('0.0.0.0', port=8080)
