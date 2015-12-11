@@ -78,9 +78,10 @@ def vote():
                 error = '이미 투표하셨네요'
             else:
                 voter.voted = True
-                db.session.add(Vote(int(form.selection.data)))
+                vote = Vote(int(form.selection.data))
+                db.session.add(vote)
                 db.session.commit()
-                return '투표했어요'
+                return render_template('result.html', vote=vote, select=list(split_response())[vote.selection][1])
         form.selection.choices = split_response()
     return render_template('vote.html', form=form, error=error,
                            vote_name=Setting.query.filter_by(name='vote_name').first().value)
